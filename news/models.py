@@ -1,10 +1,13 @@
 from django.db import models
-
+from django.db.models import Q
 
 
 
 
 class Tag(models.Model):
+    """
+    Tag model representing a tag item with name.
+    """
     name = models.CharField(max_length=50, unique=True)
     
     class Meta:
@@ -16,6 +19,9 @@ class Tag(models.Model):
 
 
 class News(models.Model):
+    """
+    News model representing a news item with title, content, tags, source, and timestamps.
+    """
     title = models.CharField(max_length=200)
     content = models.TextField()
     tag = models.ManyToManyField(Tag, related_name='news_items')
@@ -30,3 +36,23 @@ class News(models.Model):
 
     def __str__(self):
         return self.title
+
+    @classmethod
+    def search(cls, tags=None, kws=None, not_kws=None):
+        """
+        Search for news items based on tags, keywords, and excluded keywords.
+        """
+        query = cls.objects.all()
+        q_object = Q()
+        if tags:
+            for tag in tags:
+                query = query.filter(tag__iexact=tag)
+        if kws:
+            for kw in kws:
+                q_object |= Q(title__icontains=kw) | Q(content__contains=kw)
+            query = query.filter(q_object)
+        if not_kws:
+            for not_kw in not_kws:
+                q_object |= Q(title__icontains=not_kw) | Q(content__contains=not_kw)
+            query = query.exclude(q_object)
+        return query
