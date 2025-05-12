@@ -24,7 +24,7 @@ class News(models.Model):
     """
     title = models.CharField(max_length=200)
     content = models.TextField()
-    tag = models.ManyToManyField(Tag, related_name='news_items')
+    tags = models.ManyToManyField(Tag, related_name='news_items')
     source = models.CharField(max_length=200)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
@@ -46,7 +46,7 @@ class News(models.Model):
         q_object = Q()
         if tags:
             for tag in tags:
-                query = query.filter(tag__iexact=tag)
+                query = query.filter(tags__name=tag).distinct()
         if kws:
             for kw in kws:
                 q_object |= Q(title__icontains=kw) | Q(content__contains=kw)
