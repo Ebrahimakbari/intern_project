@@ -12,6 +12,9 @@ from rest_framework.response import Response
 
 
 class UserRegisterViewAPI(APIView):
+    """
+    API endpoint that allows users Register.
+    """
     serializer_class = RegisterUserSerializer
 
     def post(self, request):
@@ -30,6 +33,9 @@ class UserRegisterViewAPI(APIView):
 
 
 class LoginUserAPI(APIView):
+    """
+    API endpoint that allows users Login.
+    """
     def post(self, request):
         srz_data = LoginUserSerializer(data=request.data)
         if srz_data.is_valid():
@@ -40,6 +46,9 @@ class LoginUserAPI(APIView):
 
 
 class LogoutUserAPI(APIView):
+    """
+    API endpoint that allows users Logout.
+    """
     permission_classes = [permissions.IsAuthenticated,]
 
     def post(self, request):
