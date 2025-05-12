@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, AbstractUser
 from .managers import CustomUserManager
+from rest_framework_simplejwt.tokens import RefreshToken
 
 
 
@@ -38,3 +39,10 @@ class CustomUser(AbstractBaseUser):
     @property
     def is_staff(self):
         return self.is_admin
+
+    def get_token(self):
+        refresh = RefreshToken.for_user(self)
+        return {
+            'refresh':str(refresh),
+            'access':str(refresh.access_token),
+        }
