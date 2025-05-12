@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser
+from django.contrib.auth.models import AbstractBaseUser, AbstractUser
 from .managers import CustomUserManager
 
 
@@ -7,7 +7,7 @@ from .managers import CustomUserManager
 class CustomUser(AbstractBaseUser):
     email = models.EmailField(unique=True)
     phone_number = models.CharField(max_length=11, unique=True)
-    is_active = models.BooleanField(default=False)
+    is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
@@ -26,6 +26,9 @@ class CustomUser(AbstractBaseUser):
         return self.email
     
     def has_perm(self, perm, obj=None):
+            return True
+
+    def has_module_perms(self, app_label):
             return True
     
     @property
