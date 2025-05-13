@@ -2,14 +2,12 @@ from django.db import models
 from django.db.models import Q
 
 
-
-
 class Tag(models.Model):
     """
     Tag model representing a tag item with name.
     """
     name = models.CharField(max_length=50, unique=True)
-    
+
     class Meta:
         verbose_name = ("Tag")
         verbose_name_plural = ("Tags")
@@ -25,7 +23,7 @@ class News(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
     tags = models.ManyToManyField(Tag, related_name='news_items')
-    source = models.CharField(max_length=200)
+    source = models.URLField(max_length=200)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -53,6 +51,7 @@ class News(models.Model):
             query = query.filter(q_object)
         if not_kws:
             for not_kw in not_kws:
-                q_object |= Q(title__icontains=not_kw) | Q(content__contains=not_kw)
+                q_object |= Q(title__icontains=not_kw) | Q(
+                    content__contains=not_kw)
             query = query.exclude(q_object)
         return query
