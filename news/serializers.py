@@ -23,7 +23,16 @@ class NewsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = News
-        fields = ['id', 'title', 'content', 'tags', 'tags_detail', 'source', 'created', 'updated']
+        fields = [
+            'id',
+            'title',
+            'content',
+            'tags',
+            'tags_detail',
+            'source',
+            'created',
+            'updated'
+            ]
 
 
     def validate_source(self, value):
@@ -40,7 +49,9 @@ class NewsSerializer(serializers.ModelSerializer):
             
         # Check if another news item has this source
         if News.objects.filter(source=value).exists():
-            raise serializers.ValidationError("A news item with this source URL already exists.")
+            raise serializers.ValidationError(
+                "A news item with this source URL already exists."
+                )
             
         return value
 

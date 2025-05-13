@@ -140,7 +140,7 @@ class TagAPI(PaginationMixin, views.APIView):
                 return Response(
                     {"error": f"Failed to update tag: {str(e)}"},
                     status=status.HTTP_400_BAD_REQUEST
-                )
+                    )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request: Request, pk, *args, **kwargs):
