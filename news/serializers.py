@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from .models import Tag, News
-from rest_framework.exceptions import ValidationError
 from django.db import transaction
 
 
@@ -15,12 +14,17 @@ class TagSerializer(serializers.ModelSerializer):
 
 
 class NewsSerializer(serializers.ModelSerializer):
-    tags = TagSerializer(many=True)
+    tags = serializers.ListField(
+        child=serializers.CharField(),
+        required=False,
+        write_only=True
+    )
+    tags_detail = TagSerializer(source='tags', many=True, read_only=True)
 
     class Meta:
         model = News
-        fields = ['id', 'title', 'content',
-                    'tags', 'source', 'created', 'updated']
+        fields = ['id', 'title', 'content', 'tags', 'tags_detail', 'source', 'created', 'updated']
+
 
     def validate_source(self, value):
         """
@@ -29,12 +33,15 @@ class NewsSerializer(serializers.ModelSerializer):
         """
         # For update operations, exclude the current instance
         instance = getattr(self, 'instance', None)
-
+        
+        # If this is an update operation and the source hasn't changed, skip validation
+        if instance and instance.source == value:
+            return value
+            
+        # Check if another news item has this source
         if News.objects.filter(source=value).exists():
-            if instance and instance.source == value:
-                return value
-            raise ValidationError(
-                "A news item with this source URL already exists.")
+            raise serializers.ValidationError("A news item with this source URL already exists.")
+            
         return value
 
     @transaction.atomic
@@ -67,10 +74,8 @@ class NewsSerializer(serializers.ModelSerializer):
         - If not, create a new tag
         """
         for tag_data in tags_data:
-            tag_name = tag_data.get('name', '').strip()
+            tag_name = tag_data.strip()
             if tag_name:
-                tag, created = Tag.objects.get_or_create(
-                    name__iexact=tag_name,
-                )
+                tag, created = Tag.objects.get_or_create(name=tag_name)
                 # Add tag to news
                 news.tags.add(tag)

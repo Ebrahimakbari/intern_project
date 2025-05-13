@@ -11,6 +11,7 @@ class Tag(models.Model):
     class Meta:
         verbose_name = ("Tag")
         verbose_name_plural = ("Tags")
+        ordering = ['name']
 
     def __str__(self):
         return self.name
@@ -23,7 +24,7 @@ class News(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
     tags = models.ManyToManyField(Tag, related_name='news_items')
-    source = models.URLField(max_length=200)
+    source = models.URLField(max_length=200, unique=True)
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
 
@@ -49,9 +50,9 @@ class News(models.Model):
             for kw in kws:
                 q_object |= Q(title__icontains=kw) | Q(content__contains=kw)
             query = query.filter(q_object)
+            q_object = Q()
         if not_kws:
             for not_kw in not_kws:
-                q_object |= Q(title__icontains=not_kw) | Q(
-                    content__contains=not_kw)
+                q_object |= Q(title__icontains=not_kw) | Q(content__contains=not_kw)
             query = query.exclude(q_object)
         return query

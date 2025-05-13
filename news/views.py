@@ -99,11 +99,6 @@ class TagAPI(PaginationMixin, views.APIView):
         else:
             tags = Tag.objects.all()
 
-            # Filter by name if provided
-            name_filter = request.query_params.get('name', None)
-            if name_filter:
-                tags = tags.filter(name__icontains=name_filter)
-
             # Apply pagination
             page = self.paginate_queryset(tags)
             if page is not None:
