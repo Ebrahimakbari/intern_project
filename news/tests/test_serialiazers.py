@@ -28,15 +28,14 @@ class TagSerializerTest(TestCase):
         serializer = TagSerializer(data=data)
         self.assertTrue(serializer.is_valid())
         tag = serializer.save()
-        self.assertEqual(tag.name, "technology")  # Should be normalized
+        self.assertEqual(tag.name, "technology")
     
     def test_tag_serializer_update(self):
         """Test updating a tag with the serializer"""
         serializer = TagSerializer(self.tag, data={"name": "physics"})
         self.assertTrue(serializer.is_valid())
         updated_tag = serializer.save()
-        self.assertEqual(updated_tag.name, "physics")  # Should be normalized
-
+        self.assertEqual(updated_tag.name, "physics")
 
 class NewsSerializerTest(TestCase):
     def setUp(self):
@@ -60,7 +59,8 @@ class NewsSerializerTest(TestCase):
         self.invalid_data = {
             "title": "Duplicate Source",
             "content": "This has a duplicate source",
-            "source": "https://example.com/news",  # Same as self.news
+            # Same as self.news
+            "source": "https://example.com/news",  
             "tags": ["Technology"]
         }
 

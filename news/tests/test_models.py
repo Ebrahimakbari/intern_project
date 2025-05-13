@@ -47,7 +47,7 @@ class NewsModelTest(TestCase):
     def test_news_ordering(self):
         """Test that news items are ordered by created date (newest first)"""
         news_list = list(News.objects.all())
-        self.assertEqual(news_list[0], self.news2)  # news2 was created after news1
+        self.assertEqual(news_list[0], self.news2)
     
     def test_news_source_uniqueness(self):
         """Test that news source URLs must be unique"""
@@ -55,7 +55,8 @@ class NewsModelTest(TestCase):
             News.objects.create(
                 title="Duplicate Source",
                 content="This has a duplicate source",
-                source="https://example.com/news1"  # Same as news1
+                # Same as news1
+                source="https://example.com/news1"  
             )
     
     def test_news_search_by_tags(self):
