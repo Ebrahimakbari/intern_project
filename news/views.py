@@ -59,7 +59,8 @@ class NewsAPI(PaginationMixin, views.APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request: Request, pk, *args, **kwargs):
-        """partially Update a specific news item"""
+        """partially Update a specific tag
+        ,deleted patch method and combined these to methods"""
         news = self.get_object(pk)
         serializer = NewsSerializer(news, data=request.data, partial=True)
         if serializer.is_valid():
@@ -126,7 +127,8 @@ class TagAPI(PaginationMixin, views.APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def put(self, request: Request, pk, *args, **kwargs):
-        """partially Update a specific tag"""
+        """partially Update a specific tag
+        ,deleted patch method and combined these to methods"""
         tag = get_object_or_404(Tag, pk=pk)
         serializer = TagSerializer(tag, data=request.data, partial=True)
         if serializer.is_valid():
