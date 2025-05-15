@@ -1,28 +1,43 @@
+import os
+import django
+import json
+from datetime import datetime
+
+#Django
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
+django.setup()
+
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
-from selenium.webdriver.support.ui import WebDriverWait
+from news.serializers import NewsSerializer
 
 
 #Selenium
 options = webdriver.ChromeOptions()
 options.add_argument("--headless")
 driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-wait = WebDriverWait(driver, 10)  # Create a WebDriverWait object with a timeout of 10 seconds
 
-driver.get("https://www.zoomit.ir/archive/?sort=Newest&publishDate=All&readingTime=All&pageNumber=1")
-wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
+#Json
+json_path = "news_output.json"
+if not os.path.exists(json_path):
+    with open(json_path, 'w', encoding='utf-8') as f:
+        json.dump([], f, ensure_ascii=False, indent=2)
 
-#Link
+#Target
+driver.get("https://www.zoomit.ir/archive/")
+driver.implicitly_wait(5)
+
+#Links
 links = driver.find_elements(By.CSS_SELECTOR, "div.scroll-m-16 a")
 urls = [a.get_attribute('href') for a in links if a.get_attribute('href')]
 
 #Main
 for url in urls:
     driver.get(url)
-    wait.until(lambda driver: driver.execute_script("return document.readyState") == "complete")
-
+    driver.implicitly_wait(3)
+    
     title = driver.find_element(By.TAG_NAME, "h1").text.strip()
 
     #tags
@@ -54,7 +69,27 @@ for url in urls:
         "tags": tags,
         "source": url,
     }
-    
-    print(data)
+
+    #serializer
+    serializer = NewsSerializer(data=data)
+    if serializer.is_valid():
+        serializer.save()
+        print(f"✅: {title}")
+    else:
+        print(f"❌: {serializer.errors}")
+        continue
+
+    #JSON
+    with open(json_path, 'r+', encoding='utf-8') as f:
+        existing_data = json.load(f)
+        existing_data.append({
+            "title": title,
+            "content": content,
+            "tags": tags,
+            "source": url,
+            "scraped_at": datetime.now().isoformat()
+        })
+        f.seek(0)
+        json.dump(existing_data, f, ensure_ascii=False, indent=2)
 
 driver.quit()
