@@ -98,6 +98,7 @@ class TagAPI(PaginationMixin, views.APIView):
             serializer = TagSerializer(tag)
             return Response(serializer.data, status=status.HTTP_200_OK)
         else:
+            # List tags
             tags = Tag.objects.all()
 
             # Apply pagination

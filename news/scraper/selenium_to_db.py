@@ -39,7 +39,7 @@ class ZoomitScraper:
         time.sleep(random.uniform(min, max))
     
     def _initialize_driver(self):
-        """Set up Selenium WebDriver with configured options."""
+        """Set up Selenium WebDriver"""
         options = webdriver.ChromeOptions()
         
         options.add_argument("--headless=new")
@@ -90,7 +90,7 @@ class ZoomitScraper:
         data["content"] = '\n'.join([p.text.strip() for p in paragraphs if p.text.strip()])
         return data
     
-    def _save_to_data(self, data):
+    def _save_data(self, data):
         """Save scraped data into database using serializer and Json file."""
         serializer = NewsSerializer(data=data)
         if serializer.is_valid():
@@ -118,7 +118,7 @@ class ZoomitScraper:
             self._get_page(url)
             article_data = self._extract_article_data(url)
             if article_data["title"]:
-                self._save_to_data(article_data)
+                self._save_data(article_data)
             
             self._random_delay()
 
