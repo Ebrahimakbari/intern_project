@@ -90,7 +90,7 @@ class ZoomitScraper:
         article = self.driver.find_element(By.TAG_NAME, "article")
         first_div = article.find_element(By.XPATH, "./div[1]")
         sixth_child_div = first_div.find_element(By.XPATH, "./div[5]")
-        paragraphs = sixth_child_div.find_elements(By.TAG_NAME, "p")        
+        paragraphs = sixth_child_div.find_elements(By.TAG_NAME, "p")
         data["content"] = '\n'.join([p.text.strip() for p in paragraphs if p.text.strip()])
         return data
     
