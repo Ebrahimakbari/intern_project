@@ -404,7 +404,7 @@ pyrightconfig.json
 
 # Local History for Visual Studio Code
 .history/
-
+*.json
 # Built Visual Studio Code Extensions
 *.vsix
 

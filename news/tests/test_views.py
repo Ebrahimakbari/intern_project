@@ -180,7 +180,8 @@ class TagAPITest(TestCase):
         data = {"name": "computer science"}
         
         response = self.client.put(
-            reverse('news:tag-detail', args=[self.tag2.id]),
+            reverse('news:tag-detail',
+            args=[self.tag2.id]),
             data=json.dumps(data),
             content_type='application/json'
         )
