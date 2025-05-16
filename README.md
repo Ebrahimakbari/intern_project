@@ -1,1 +1,1 @@
-# Inter Project
+# Intern Project
