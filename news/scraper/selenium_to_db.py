@@ -51,6 +51,8 @@ class ZoomitScraper:
         options.add_experimental_option("useAutomationExtension", False)
         options.add_argument(f"user-agent={random.choice(self.user_agents)}")
         
+        #TODO: Download and Update the chromedriver patch for dockerize 
+        # service = Service(executable_path='')
         service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=options)
         self.driver.set_page_load_timeout(30)
@@ -86,7 +88,9 @@ class ZoomitScraper:
         
         # Extract content
         article = self.driver.find_element(By.TAG_NAME, "article")
-        paragraphs = article.find_elements(By.XPATH, ".//p")
+        first_div = article.find_element(By.XPATH, "./div[1]")
+        sixth_child_div = first_div.find_element(By.XPATH, "./div[5]")
+        paragraphs = sixth_child_div.find_elements(By.TAG_NAME, "p")        
         data["content"] = '\n'.join([p.text.strip() for p in paragraphs if p.text.strip()])
         return data
     
