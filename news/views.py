@@ -16,7 +16,7 @@ class NewsAPI(PaginationMixin, views.APIView):
     pagination_class = CustomPagination
     # permission_classes = [permissions.IsAuthenticated]
 
-    def get_object(self, pk):
+    def get_object(self, pk: int):
         return get_object_or_404(News, pk=pk)
 
     def get(self, request: Request, pk=None, *args, **kwargs):
@@ -58,7 +58,7 @@ class NewsAPI(PaginationMixin, views.APIView):
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request: Request, pk, *args, **kwargs):
+    def put(self, request: Request, pk: int, *args, **kwargs):
         """partially Update a specific tag
         ,deleted patch method and combined these to methods"""
         news = self.get_object(pk)
@@ -77,7 +77,7 @@ class NewsAPI(PaginationMixin, views.APIView):
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request: Request, pk, *args, **kwargs):
+    def delete(self, request: Request, pk: int, *args, **kwargs):
         """Delete a specific news item"""
         news = self.get_object(pk)
         news.delete()
@@ -127,7 +127,7 @@ class TagAPI(PaginationMixin, views.APIView):
                 )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def put(self, request: Request, pk, *args, **kwargs):
+    def put(self, request: Request, pk: int, *args, **kwargs):
         """partially Update a specific tag
         ,deleted patch method and combined these to methods"""
         tag = get_object_or_404(Tag, pk=pk)
@@ -146,7 +146,7 @@ class TagAPI(PaginationMixin, views.APIView):
                     )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request: Request, pk, *args, **kwargs):
+    def delete(self, request: Request, pk: int, *args, **kwargs):
         """Delete a specific tag"""
         tag = get_object_or_404(Tag, pk=pk)
         tag.delete()
