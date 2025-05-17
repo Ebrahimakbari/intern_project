@@ -53,8 +53,8 @@ class ZoomitScraper:
         options.add_argument(f"user-agent={random.choice(self.user_agents)}")
         
         #TODO: Download and Update the chromedriver patch for dockerize 
-        # service = Service(executable_path='')
-        service = Service(ChromeDriverManager().install())
+        service = Service(executable_path='/home/ebrahim/Desktop/projects/INTERN/chromedriver-linux64/chromedriver')
+        # service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=options)
         self.driver.set_page_load_timeout(30)
         self.driver.set_script_timeout(20)
@@ -110,7 +110,9 @@ class ZoomitScraper:
             serializer.save()
             with open(self.json_path, 'r+', encoding='utf-8') as f:
                 existing_data = json.load(f)
-                existing_data.append({**data,"scraped_at": datetime.now(tz=pytz.timezone('Asia/Tehran')).isoformat()})
+                existing_data.append(
+                    {**data,"scraped_at": datetime.now(tz=pytz.timezone('Asia/Tehran')).isoformat()}
+                    )
                 f.seek(0)
                 json.dump(existing_data, f, ensure_ascii=False, indent=2)
             print(f"DONE: {data['title']}")
