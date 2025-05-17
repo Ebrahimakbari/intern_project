@@ -82,15 +82,23 @@ class ZoomitScraper:
         
         # Extract tags
         h1_elem = self.driver.find_element(By.TAG_NAME, 'h1')
-        siblings = h1_elem.find_elements(By.XPATH, './following-sibling::div')
-        tag_div = siblings[1] if len(siblings) >= 2 else None
-        data["tags"] = [span.text.strip() for span in tag_div.find_elements(By.CSS_SELECTOR, 'a span')] if tag_div else []
-        
+        parent_elem = h1_elem.find_element(By.XPATH, './..')
+        tag_elements = parent_elem.find_elements(By.XPATH, './/a[span]')
+        data['tags'] = [
+            span.text.strip() 
+            for a_tag in tag_elements 
+            for span in a_tag.find_elements(By.TAG_NAME, 'span')
+            if span.text.strip()
+        ]
+
         # Extract content
         article = self.driver.find_element(By.TAG_NAME, "article")
         first_div = article.find_element(By.XPATH, "./div[1]")
         sixth_child_div = first_div.find_element(By.XPATH, "./div[5]")
         paragraphs = sixth_child_div.find_elements(By.TAG_NAME, "p")
+        if len(paragraphs) == 0:
+            sixth_child_div = first_div.find_element(By.XPATH, "./div[4]")
+            paragraphs = sixth_child_div.find_elements(By.TAG_NAME, "p")
         data["content"] = '\n'.join([p.text.strip() for p in paragraphs if p.text.strip()])
         return data
     
