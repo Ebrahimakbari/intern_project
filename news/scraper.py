@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+import pytz
 
 #Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
@@ -109,7 +110,7 @@ class ZoomitScraper:
             serializer.save()
             with open(self.json_path, 'r+', encoding='utf-8') as f:
                 existing_data = json.load(f)
-                existing_data.append({**data,"scraped_at": datetime.now().isoformat()})
+                existing_data.append({**data,"scraped_at": datetime.now(tz=pytz.timezone('Asia/Tehran')).isoformat()})
                 f.seek(0)
                 json.dump(existing_data, f, ensure_ascii=False, indent=2)
             print(f"DONE: {data['title']}")
