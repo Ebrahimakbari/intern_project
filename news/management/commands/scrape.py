@@ -1,5 +1,6 @@
 from django.core.management.base import BaseCommand
-from news.scraper.selenium_to_db import ZoomitScraper
+from news.scraper import ZoomitScraper
+
 
 
 class Command(BaseCommand):

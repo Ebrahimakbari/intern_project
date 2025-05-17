@@ -123,7 +123,11 @@ class ZoomitScraper:
 
         # Get all article links
         links = self.driver.find_elements(By.CSS_SELECTOR, "div.scroll-m-16 a")
-        urls = [a.get_attribute('href') for a in links if a.get_attribute('href')]
+        urls = [
+            a.get_attribute('href') 
+            for a in links 
+            if a.get_attribute('href') and not a.find_elements(By.XPATH, ".//span[contains(text(), 'تبلیغات')]")
+        ]
         print(f"Found {len(urls)} articles!")
         
         for url in urls:
