@@ -6,6 +6,8 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+import pytz
+from decouple import config
 
 #Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
@@ -51,9 +53,8 @@ class ZoomitScraper:
         options.add_experimental_option("useAutomationExtension", False)
         options.add_argument(f"user-agent={random.choice(self.user_agents)}")
         
-        #TODO: Download and Update the chromedriver patch for dockerize 
-        # service = Service(executable_path='')
-        service = Service(ChromeDriverManager().install())
+        service = Service(executable_path=config('CHROME_DRIVER_PATH', '/home/ebrahim/Desktop/projects/INTERN/chromedriver-linux64/chromedriver'))
+        # service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=options)
         self.driver.set_page_load_timeout(30)
         self.driver.set_script_timeout(20)
@@ -109,7 +110,9 @@ class ZoomitScraper:
             serializer.save()
             with open(self.json_path, 'r+', encoding='utf-8') as f:
                 existing_data = json.load(f)
-                existing_data.append({**data,"scraped_at": datetime.now().isoformat()})
+                existing_data.append(
+                    {**data,"scraped_at": datetime.now(tz=pytz.timezone('Asia/Tehran')).isoformat()}
+                    )
                 f.seek(0)
                 json.dump(existing_data, f, ensure_ascii=False, indent=2)
             print(f"DONE: {data['title']}")
@@ -123,7 +126,11 @@ class ZoomitScraper:
 
         # Get all article links
         links = self.driver.find_elements(By.CSS_SELECTOR, "div.scroll-m-16 a")
-        urls = [a.get_attribute('href') for a in links if a.get_attribute('href')]
+        urls = [
+            a.get_attribute('href') 
+            for a in links 
+            if a.get_attribute('href') and not a.find_elements(By.XPATH, ".//span[contains(text(), 'تبلیغات')]")
+        ]
         print(f"Found {len(urls)} articles!")
         
         for url in urls:

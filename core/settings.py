@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 from decouple import config
+from celery.schedules import schedule
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,7 +28,7 @@ SECRET_KEY = config('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -44,6 +45,7 @@ INSTALLED_APPS = [
     'news',
     # external
     'rest_framework',
+    'django_celery_beat',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
     'drf_yasg',
@@ -96,7 +98,7 @@ DATABASES = {
         'NAME': config('NAME'),
         'USER': config('USER'),
         'PASSWORD': config('PASSWORD'),
-        'HOST': config('HOST'),
+        'HOST': config('HOST', 'localhost'),
         'PORT': config('PORT'),
     }
 }
@@ -126,7 +128,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Tehran'
 
 USE_I18N = True
 
@@ -137,6 +139,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATICFILES_DIRS = [
+    BASE_DIR / 'static'
+]
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+MEDIA_URL = 'media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -163,3 +173,28 @@ SIMPLE_JWT = {
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
     'BLACKLIST_AFTER_ROTATION': True,
 }
+
+
+# CELERY CONFIGS
+CELERY_BROKER_URL = config('CELERY_BROKER_URL', 'redis://localhost:6379/0')
+CELERY_RESULT_BACKEND = config('CELERY_RESULT_BACKEND', 'redis://localhost:6379/0')
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'pickle'
+CELERY_ACCEPT_CONTENT = ['json', 'pickle']
+CELERY_RESULT_EXPIRES = timedelta(days=1)
+CELERY_TASK_ALWAYS_EAGER = False
+CELERY_WORKER_PREFETCH_MULTIPLIER = 4
+CELERY_TIMEZONE = 'Asia/Tehran'
+
+
+CELERY_BEAT_SCHEDULE = {
+    "sample_task": {
+        "task": "news.tasks.scrape_zoomit",
+        "schedule": schedule(int(config('CELERY_TASK_ZOOMIT_SCHEDULE_SECOND'))),
+    },
+}
+
+
+# Flower Configuration
+CELERY_FLOWER_USER = config('CELERY_FLOWER_USER', 'admin')
+CELERY_FLOWER_PASSWORD = config('CELERY_FLOWER_PASSWORD', 'admin')
