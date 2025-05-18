@@ -1,0 +1,99 @@
+services:
+  web:
+    build: .
+    container_name: web
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+    restart: unless-stopped
+    networks:
+      - main
+
+  celery:
+    container_name: celery
+    build: .
+    command: celery -A core worker --loglevel=info -n ${CELERY_WORKER_NAME}
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+      - web
+    restart: unless-stopped
+    networks:
+      - main
+
+  celery-beat:
+    build: .
+    container_name: celery-beat
+    command: celery -A core beat --loglevel=info
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+      - web
+    restart: unless-stopped
+    networks:
+      - main
+
+  flower:
+    build: .
+    container_name: flower
+    command: celery -A core flower --port=5555 --basic_auth=${CELERY_FLOWER_USER}:${CELERY_FLOWER_PASSWORD} --persistent=True --db=/app/flower.db --broker_api=redis:{CELERY_BROKER_URL}
+    volumes:
+      - .:/app
+    ports:
+      - "5555:5555"
+    env_file:
+      - .env
+    depends_on:
+      - redis
+      - db
+      - celery
+    restart: unless-stopped
+    networks:
+      - main
+
+  db:
+    image: postgres:17
+    container_name: db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    env_file:
+      - .env
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - main
+
+  redis:
+    image: redis:7
+    container_name: redis
+    env_file:
+      - .env
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - main
+
+volumes:
+  postgres_data:
+  redis_data:
+networks:
+  main:

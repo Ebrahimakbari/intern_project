@@ -20,10 +20,10 @@ media
 # Byte-compiled / optimized / DLL files
 *.py[cod]
 *$py.class
-
+flower.db
 # C extensions
 *.so
-
+chromedriver.zip
 # Distribution / packaging
 .Python
 build/

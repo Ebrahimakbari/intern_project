@@ -7,6 +7,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 import pytz
+from decouple import config
 
 #Django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "core.settings")
@@ -52,8 +53,7 @@ class ZoomitScraper:
         options.add_experimental_option("useAutomationExtension", False)
         options.add_argument(f"user-agent={random.choice(self.user_agents)}")
         
-        #TODO: Download and Update the chromedriver patch for dockerize 
-        service = Service(executable_path='/home/ebrahim/Desktop/projects/INTERN/chromedriver-linux64/chromedriver')
+        service = Service(executable_path=config('CHROME_DRIVER_PATH', '/home/ebrahim/Desktop/projects/INTERN/chromedriver-linux64/chromedriver'))
         # service = Service(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=options)
         self.driver.set_page_load_timeout(30)
