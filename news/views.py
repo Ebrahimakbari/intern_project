@@ -5,6 +5,8 @@ from .serializers import NewsSerializer, TagSerializer
 from .models import News, Tag
 from django.shortcuts import get_object_or_404
 from .pagination import PaginationMixin, CustomPagination
+from utils import IsAdminOrReadOnly
+
 
 
 class NewsAPI(PaginationMixin, views.APIView):
@@ -14,7 +16,7 @@ class NewsAPI(PaginationMixin, views.APIView):
     """
 
     pagination_class = CustomPagination
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
 
     def get_object(self, pk: int):
         return get_object_or_404(News, pk=pk)
@@ -88,7 +90,7 @@ class TagAPI(PaginationMixin, views.APIView):
     """
     API view to list, retrieve, update or delete tag items.
     """
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [IsAdminOrReadOnly]
     pagination_class = CustomPagination
 
     def get(self, request: Request, pk=None, *args, **kwargs):
