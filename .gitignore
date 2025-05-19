@@ -27,6 +27,7 @@ chromedriver.zip
 # Distribution / packaging
 .Python
 build/
+staticfiles/
 develop-eggs/
 dist/
 downloads/

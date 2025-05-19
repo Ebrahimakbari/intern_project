@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -11,7 +11,6 @@ RUN apt-get update && apt-get install -y \
     python3-dev \
     libpq-dev \
     unzip \
-    netcat-openbsd \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Chrome for Selenium
@@ -21,6 +20,7 @@ RUN apt-get update && apt-get install -y wget gnupg \
     && apt-get update \
     && apt-get install -y google-chrome-stable fonts-ipafont-gothic fonts-wqy-zenhei fonts-thai-tlwg fonts-kacst fonts-freefont-ttf libxss1 \
     --no-install-recommends \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy ChromeDriver from the local machine
@@ -32,8 +32,8 @@ RUN unzip /tmp/chromedriver.zip -d /tmp/ \
     && chmod +x /usr/local/bin/chromedriver \
     && rm -rf /tmp/chromedriver-linux64
 
-
 COPY requirements.txt .
-RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 COPY . .

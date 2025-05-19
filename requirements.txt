@@ -53,4 +53,5 @@ vine==5.1.0
 wcwidth==0.2.13
 webdriver-manager==4.0.2
 websocket-client==1.8.0
+whitenoise==6.9.0
 wsproto==1.2.0

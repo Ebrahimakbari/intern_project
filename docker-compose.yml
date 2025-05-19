@@ -19,7 +19,7 @@ services:
   celery:
     container_name: celery
     build: .
-    command: celery -A core worker --loglevel=info -n ${CELERY_WORKER_NAME}
+    command: celery -A core worker --loglevel=info
     volumes:
       - .:/app
     env_file:
@@ -51,7 +51,13 @@ services:
   flower:
     build: .
     container_name: flower
-    command: celery -A core flower --port=5555 --basic_auth=${CELERY_FLOWER_USER}:${CELERY_FLOWER_PASSWORD} --persistent=True --db=/app/flower.db --broker_api=redis:{CELERY_BROKER_URL}
+    command: >
+      celery -A core flower
+      --port=5555 
+      --basic_auth=${CELERY_FLOWER_USER}:${CELERY_FLOWER_PASSWORD} 
+      --persistent=True 
+      --db=/app/flower.db 
+      --broker_api=${CELERY_BROKER_URL}
     volumes:
       - .:/app
     ports:
@@ -86,14 +92,11 @@ services:
       - .env
     ports:
       - "6379:6379"
-    volumes:
-      - redis_data:/data
     restart: unless-stopped
     networks:
       - main
 
 volumes:
   postgres_data:
-  redis_data:
 networks:
   main:
